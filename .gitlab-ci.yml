@@ -21,8 +21,8 @@ stages:          # List of stages for jobs, and their order of execution
 include:
   # Docker Build
   - template: Docker.gitlab-ci.yml
-#   # Enable ArgoCD Deployment
-#   - project: 'madou-stories/gitlab-ci-catalog'
-#     ref: main
-#     file: '/ArgoCD/Deploy.gitlab-ci.yml'
+  # Enable ArgoCD Deployment
+  - project: 'madou-stories/gitlab-ci-catalog'
+    ref: main
+    file: '/ArgoCD/Deploy.gitlab-ci.yml'
   
