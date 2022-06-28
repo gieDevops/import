@@ -17,6 +17,7 @@ stages:          # List of stages for jobs, and their order of execution
   - build
   - review
   - cleanup
+  - production
 
 include:
   # Docker Build
