@@ -55,7 +55,7 @@ build-vars:
 
 gitops:update-manifests:
   stage: deploy
-  trigger: $CI_PROJECT_PATH
+  trigger: $CI_PROJECT_PATH-configuration
 
 #Argo CD Deployment
 .argocd:
