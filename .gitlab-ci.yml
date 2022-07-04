@@ -37,6 +37,35 @@ docker-build:
     - exists:
         - Dockerfile
 
+# Update GitOps Configuration
+gitops:update-manifests:
+  stage: deploy
+  image: 
+    name: alpine/git:v2.32.0
+    entrypoint: ["/bin/sh", "-c"]
+  #to remove
+  before_script:
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh && chmod 600 ~/.ssh
+    - ssh-keyscan -H ${CI_SERVER_HOST} >> ~/.ssh/known_hosts
+    - echo "${CONFIGURATION_SSH_PRIVATE_KEY}" |  tr -d ' ' | base64 -d | ssh-add -
+    - git config --global user.email "git@gitlabrunner.com"
+    - git config --global user.name "Gitlab Runner"
+  script:
+    - git clone "git@${CI_SERVER_HOST}:${CI_PROJECT_PATH}-configuration" "${CI_COMMIT_SHA}"
+    - cd "${CI_COMMIT_SHA}"
+    - git checkout "${CI_DEFAULT_BRANCH}"
+    - sed -i "s/^\(  tag:\).*$/\1 ${CI_COMMIT_SHA}/g" chart/values-production.yaml
+    - git add .
+    - |-
+      if [ "$(git status --porcelain | wc -l)" -gt "0" ]; then
+        git status
+        git commit -m "Update the image tag with '${CI_COMMIT_SHA}' (automated by GitLab CI)"
+        git push origin "${CI_DEFAULT_BRANCH}" -o ci.skip
+      fi
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
 #Argo CD Deployment
 .argocd:
   image: "argoproj/argocd:${ARGOCD_IMAGE_VERSION}"
