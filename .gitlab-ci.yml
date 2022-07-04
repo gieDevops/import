@@ -55,7 +55,7 @@ build-vars:
 
 gitops:update-manifests:
   stage: deploy
-  trigger: $CI_PROJECT_PATH-configuration
+  trigger: madou-stories/dynamic-environments-with-argo-cd/the-application-configuration
 
 #Argo CD Deployment
 .argocd:
