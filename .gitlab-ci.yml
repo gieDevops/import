@@ -39,31 +39,17 @@ docker-build:
         - Dockerfile
 
 # Update GitOps Configuration
-gitops:update-manifests:
-  stage: deploy
-  image: 
-    name: alpine/git:v2.32.0
-    entrypoint: ["/bin/sh", "-c"]
-  #to remove
-  before_script:
-    - eval $(ssh-agent -s)
-    - mkdir -p ~/.ssh && chmod 600 ~/.ssh
-    - ssh-keyscan -H ${CI_SERVER_HOST} >> ~/.ssh/known_hosts
-    - echo "${CONFIGURATION_SSH_PRIVATE_KEY}" |  tr -d ' ' | base64 -d | ssh-add -
-    - git config --global user.email "git@gitlabrunner.com"
-    - git config --global user.name "Gitlab Runner"
+build-vars:
+  stage: build
   script:
-    - git clone "git@${CI_SERVER_HOST}:${CI_PROJECT_PATH}-configuration" "${CI_COMMIT_SHA}"
-    - cd "${CI_COMMIT_SHA}"
-    - git checkout "${CI_DEFAULT_BRANCH}"
-    - sed -i "s/^\(  tag:\).*$/\1 ${CI_COMMIT_SHA}/g" chart/values-production.yaml
-    - git add .
-    - |-
-      if [ "$(git status --porcelain | wc -l)" -gt "0" ]; then
-        git status
-        git commit -m "Update the image tag with '${CI_COMMIT_SHA}' (automated by GitLab CI)"
-        git push origin "${CI_DEFAULT_BRANCH}" -o ci.skip
-      fi
+    - echo "IMAGE_REPOSITORY=$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG" >> build.env
+    - echo "IMAGE_TAG=$CI_COMMIT_SHA" >> build.env
+    - echo "GITLAB_ENVURL=https://$ARGOCD_PROD_APPLICATION_NAME-prod.$KUBE_INGRESS_BASE_DOMAIN" >> build.env
+    - echo "SERVICE_URL=https://$ARGOCD_PROD_APPLICATION_NAME-prod.$KUBE_INGRESS_BASE_DOMAIN" >> build.env
+    - echo "SERVICE_PORT=5000" >> build.env
+  artifacts:
+    reports:
+      dotenv: build.env
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
