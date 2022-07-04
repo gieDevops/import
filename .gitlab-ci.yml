@@ -53,6 +53,10 @@ build-vars:
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
+gitops:update-manifests:
+  stage: deploy
+  trigger: $CI_PROJECT_PATH
+
 #Argo CD Deployment
 .argocd:
   image: "argoproj/argocd:${ARGOCD_IMAGE_VERSION}"
