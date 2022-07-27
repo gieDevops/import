@@ -53,7 +53,7 @@ build-vars:
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
-gitops:update-manifests:
+update-manifests:
   stage: deploy
   trigger: 
     project: madou-stories/dynamic-environments-with-argo-cd/the-application-configuration
