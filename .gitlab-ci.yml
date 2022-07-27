@@ -66,7 +66,7 @@ gitops:update-manifests:
     - argocd login ${ARGOCD_SERVER_URL} --insecure --grpc-web --username ${ARGOCD_USERNAME} --password ${ARGOCD_PASSWORD}
   dependencies: []
 
-argocd:review:
+reviewops:
   extends: .argocd
   stage: review
   script:
@@ -83,7 +83,7 @@ argocd:review:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
-argocd:stop_review:
+stop-reviewops:
   extends: .argocd
   stage: cleanup
   script:
