@@ -76,7 +76,7 @@ reviewops:
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: http://$ARGOCD_REVIEW_APPLICATION_NAME.$KUBE_INGRESS_BASE_DOMAIN
-    on_stop: argocd:stop_review
+    on_stop: stop-reviewops
   artifacts:
     paths: [environment_url.txt]
     when: always
