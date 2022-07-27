@@ -58,7 +58,9 @@ update-manifests:
   trigger: 
     project: madou-stories/dynamic-environments-with-argo-cd/the-application-configuration
     strategy: depend
-
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    
 #Argo CD Deployment
 .argocd:
   image: "argoproj/argocd:${ARGOCD_IMAGE_VERSION}"
