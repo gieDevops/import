@@ -89,7 +89,7 @@ stop-reviewops:
   extends: .argocd
   stage: cleanup
   script:
-    - argocd app delete-resource ${ARGOCD_REVIEW_APPLICATION_NAME} --kind Deployment
+    - echo "stopping environment 'review/$CI_COMMIT_REF_NAME'"
   environment:
     name: review/$CI_COMMIT_REF_NAME
     action: stop
