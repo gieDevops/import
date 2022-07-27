@@ -96,7 +96,7 @@ stop-reviewops:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: manual
 
-argocd:production:
+deploy:
   extends: .argocd
   stage: production
   script:
