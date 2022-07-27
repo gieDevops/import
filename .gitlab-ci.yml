@@ -16,7 +16,7 @@ variables:
 stages:
   - build
   - review
-  - deploy
+  - configure
   - cleanup
   - production
 
