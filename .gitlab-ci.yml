@@ -56,7 +56,7 @@ build-vars:
 update-manifests:
   stage: configure
   trigger: 
-    project: madou-stories/dynamic-environments-with-argo-cd/the-application-configuration
+    project: jrandazzo-demo/argocd/appsets-and-mrs/the-application-configuration
     strategy: depend
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
