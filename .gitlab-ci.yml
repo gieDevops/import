@@ -16,9 +16,9 @@ variables:
 stages:
   - build
   - review
-  - configure
   - cleanup
-  - production
+  #- configure
+  #- production
 
 docker-build:
   # Use the official docker image.
@@ -37,29 +37,6 @@ docker-build:
   rules:
     - exists:
         - Dockerfile
-
-# Update GitOps Configuration
-build-vars:
-  stage: build
-  script:
-    - echo "IMAGE_REPOSITORY=$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG" >> build.env
-    - echo "IMAGE_TAG=$CI_COMMIT_SHA" >> build.env
-    - echo "GITLAB_ENVURL=https://$ARGOCD_PROD_APPLICATION_NAME-prod.$KUBE_INGRESS_BASE_DOMAIN" >> build.env
-    - echo "SERVICE_URL=https://$ARGOCD_PROD_APPLICATION_NAME-prod.$KUBE_INGRESS_BASE_DOMAIN" >> build.env
-    - echo "SERVICE_PORT=5000" >> build.env
-  artifacts:
-    reports:
-      dotenv: build.env
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-
-update-manifests:
-  stage: configure
-  trigger: 
-    project: jrandazzo-demo/argocd/appsets-and-mrs/the-application-configuration
-    strategy: depend
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     
 #Argo CD Deployment
 .argocd:
@@ -98,15 +75,44 @@ stop-reviewops:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: manual
 
-deploy:
-  extends: .argocd
-  stage: production
-  script:
-    - argocd app sync ${ARGOCD_PROD_APPLICATION_NAME}
-    - argocd app wait ${ARGOCD_PROD_APPLICATION_NAME}
-  environment:
-    name: production
-    url: https://${ARGOCD_PROD_APPLICATION_NAME}-prod.${KUBE_INGRESS_BASE_DOMAIN}
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+# 
+###### Disabling production deploys. This tutorial is to show review apps in the merge request. Uncomment to trigger production updates with multi-project pipelines to the "App configuration"
+#
+# Update GitOps Configuration
+# build-vars:
+#   stage: build
+#   script:
+#     - echo "IMAGE_REPOSITORY=$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG" >> build.env
+#     - echo "IMAGE_TAG=$CI_COMMIT_SHA" >> build.env
+#     - echo "GITLAB_ENVURL=https://$ARGOCD_PROD_APPLICATION_NAME-prod.$KUBE_INGRESS_BASE_DOMAIN" >> build.env
+#     - echo "SERVICE_URL=https://$ARGOCD_PROD_APPLICATION_NAME-prod.$KUBE_INGRESS_BASE_DOMAIN" >> build.env
+#     - echo "SERVICE_PORT=5000" >> build.env
+#   artifacts:
+#     reports:
+#       dotenv: build.env
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+# 
+# update-manifests:
+#   stage: configure
+#   trigger: 
+#     project: madou-stories/dynamic-environments-with-argo-cd/the-application-configuration
+#     strategy: depend
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+# 
+# deploy:
+#   extends: .argocd
+#   stage: production
+#   script:
+#     - argocd app sync ${ARGOCD_PROD_APPLICATION_NAME}
+#     - argocd app wait ${ARGOCD_PROD_APPLICATION_NAME}
+#   environment:
+#     name: production
+#     url: https://${ARGOCD_PROD_APPLICATION_NAME}-prod.${KUBE_INGRESS_BASE_DOMAIN}
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
